@@ -97,11 +97,13 @@ def main(argv):
     data=data.replace(" (LinkedIn)", "")
     data=data.replace("\uf0a7", "")
     data=data.replace("(Mobile)", "")
+    data=data.replace("-       ", "")
+
     
 
     
     result_list=data.split('\n')
-    # print(result_list)
+    #print(result_list)
     skills=[]
     languages=[]
     summary=[]
@@ -167,7 +169,12 @@ def main(argv):
             while True:
                 experience.append(result_list[value])
                 value=value+1
-                if result_list[value] =='':
+                a=str(result_list[value])
+                if a.__contains__('-'):
+                    k=a.split('-')
+                    print('start:',k[0],'end:',k[1])
+                    break
+                elif result_list[value] =='':
                     break
             
             listOfExp = ["company", "position","period","place","description" ]
@@ -182,6 +189,11 @@ def main(argv):
             while True:
                 education.append(result_list[value])
                 value=value+1
+                # a=str(result_list[value])
+                # if a.__contains__('-'):
+                #     k=a.split('-')
+                #     print('start:',k[0],'end:',k[1])
+                #     break
                 if result_list[value] =='':
                     break
             listOfEdu = ["school", "degree" ]
@@ -189,8 +201,9 @@ def main(argv):
             zipbObj = zip(listOfEdu, education)
             edu_dict = dict(zipbObj)
 
-    print(languages)
-    #print(contact,'\n',linkedin,'\n',summary,'\n',skills,'\n',certifications,'\n',languages,'\n',exp_dict,'\n',edu_dict)
+   # print(languages)
+    print('###############')
+    print(contact,'\n',linkedin,'\n',summary,'\n',skills,'\n',certifications,'\n',languages,'\n',exp_dict,'\n',edu_dict)
 
     #print(data.splitlines())
     device.close()
