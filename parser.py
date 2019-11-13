@@ -154,7 +154,7 @@ def main(argv):
                 value=value+1
                 if result_list[value] =='':
                     break
-        if i.__contains__('Languages'):
+        if i=='Languages':
             value=result_list.index(i)
             while True:
                 languages.append(result_list[value])
@@ -189,8 +189,8 @@ def main(argv):
             zipbObj = zip(listOfEdu, education)
             edu_dict = dict(zipbObj)
 
-    #print(exp_dict)
-    print(contact,'\n',linkedin,'\n',summary,'\n',skills,'\n',certifications,'\n',languages,'\n',exp_dict,'\n',edu_dict)
+    print(languages)
+    #print(contact,'\n',linkedin,'\n',summary,'\n',skills,'\n',certifications,'\n',languages,'\n',exp_dict,'\n',edu_dict)
 
     #print(data.splitlines())
     device.close()
