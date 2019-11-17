@@ -15,92 +15,33 @@ from contextlib import redirect_stdout
 # main
 def main(argv):
     import getopt
-    def usage():
-        print ('usage: %s [-P password] [-o output] [-t text|html|xml|tag]'
-               ' [-O output_dir] [-c encoding] [-s scale] [-R rotation]'
-               ' [-Y normal|loose|exact] [-p pagenos] [-m maxpages]'
-               ' [-S] [-C] [-n] [-A] [-V] [-M char_margin] [-L line_margin]'
-               ' [-W word_margin] [-F boxes_flow] [-d] input.pdf ...' % argv[0])
-        return 100
-    try:
-        (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
-    except getopt.GetoptError:
-        return usage()
-    if not args: return usage()
-    # debug option
-    debug = 0
-    # input option
-    password = b''
+    (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
     pagenos = set()
     maxpages = 0
-    # output option
-    outfile = None
-    outtype = None
     imagewriter = None
-    rotation = 0
-    stripcontrol = False
-    layoutmode = 'normal'
-    encoding = 'utf-8'
-    pageno = 1
-    scale = 1
+    # pageno = 1
     caching = True
-    showpageno = True
+    # showpageno = False
     laparams = LAParams()
-    pages_text = []
-    for (k, v) in opts:
-        if k == '-d': debug += 1
-        elif k == '-P': password = v.encode('ascii')
-        elif k == '-o': outfile = v
-        elif k == '-t': outtype = v
-        elif k == '-O': imagewriter = ImageWriter(v)
-        elif k == '-c': encoding = v
-        elif k == '-s': scale = float(v)
-        elif k == '-R': rotation = int(v)
-        elif k == '-Y': layoutmode = v
-        elif k == '-p': pagenos.update( int(x)-1 for x in v.split(',') )
-        elif k == '-m': maxpages = int(v)
-        elif k == '-S': stripcontrol = True
-        elif k == '-C': caching = False
-        elif k == '-n': laparams = None
-        elif k == '-A': laparams.all_texts = True
-        elif k == '-V': laparams.detect_vertical = True
-        elif k == '-M': laparams.char_margin = float(v)
-        elif k == '-W': laparams.word_margin = float(v)
-        elif k == '-L': laparams.line_margin = float(v)
-        elif k == '-F': laparams.boxes_flow = float(v)
-    #
-    # PDFDocument.debug = debug
-    # PDFParser.debug = debug
-    # CMapDB.debug = debug
-    # PDFPageInterpreter.debug = debug
-    #
+    # pages_text = []
+ 
     retstr = io.StringIO()
     rsrcmgr = PDFResourceManager(caching=caching)
-    device = TextConverter(rsrcmgr, retstr, laparams=laparams,imagewriter=imagewriter)
+    device = TextConverter(rsrcmgr, retstr, laparams=laparams,imagewriter=imagewriter )
     data = []
     
     for fname in args:
         with open(fname, 'rb') as fp:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.get_pages(fp, pagenos,
-                                          maxpages=maxpages, password=password,
+            for page in PDFPage.get_pages(fp,
+                                          maxpages=maxpages, 
                                           caching=caching, check_extractable=True):
                 interpreter.process_page(page)
                 data = retstr.getvalue()
-   #print(data)
-    data=data.replace("\xa0", "")
-    data=data.replace("\uf0da", "")
-    data=data.replace("\x0c", "")
-    data=data.replace("• ", "")
-    data=data.replace("* ", "")
-    data=data.replace("(LinkedIn)", "")
-    data=data.replace(" (LinkedIn)", "")
-    data=data.replace("\uf0a7", "")
-    data=data.replace("(Mobile)", "")
-    data=data.replace("-       ", "")
 
-    
-
+    weird=["\xa0","\uf0da","\x0c","• ","* ","(LinkedIn)"," (LinkedIn)","\uf0a7","(Mobile)","-       ","●"]
+    for i in weird:
+       data=data.replace(i, "")
     
     result_list=data.split('\n')
     #print(result_list)
@@ -114,55 +55,70 @@ def main(argv):
     education=[]
     exp_dict={}
     edu_dict={}
+    alld={}
 
     for i in result_list:
         if i=='Contact':
             value=result_list.index(i)
             while True:
-                contact.append(result_list[value].strip())
                 value=value+1
+                contact.append(result_list[value].strip())
+                
                 if result_list[value] =='':
+                    contact.remove(result_list[value])
                     break
+        
         if i.__contains__('www.linkedin.com'):
             value=result_list.index(i)
-            while True:
+            while True:             
                 linkedin.append(result_list[value])
                 value=value+1
                 if result_list[value] =='':
+            
                     break
             if len(linkedin)>=2:
                 ln=[]
                 merged=linkedin[0]+linkedin[1].strip()
                 ln.append(merged)
                 linkedin=ln
+        
         if i=='Top Skills':
             value=result_list.index(i)
             while True:
-                skills.append(result_list[value])
                 value=value+1
+                skills.append(result_list[value])
                 if result_list[value] =='':
+                    skills.remove(result_list[value])
                     break
+          
+    
         if i.__contains__('Certifications'):
             value=result_list.index(i)
             while True:
-                certifications.append(result_list[value])
                 value=value+1
+                certifications.append(result_list[value])
                 if result_list[value] =='':
+                    certifications.remove(result_list[value])
                     break
+        
         if i.__contains__('Summary'):
             value=result_list.index(i)
             while True:
-                summary.append(result_list[value])
                 value=value+1
+                summary.append(result_list[value])
                 if result_list[value] =='':
+                    summary.remove(result_list[value])
                     break
+        
         if i=='Languages':
             value=result_list.index(i)
             while True:
-                languages.append(result_list[value])
                 value=value+1
+                languages.append(result_list[value])
                 if result_list[value] =='':
+                    languages.remove(result_list[value])
                     break
+          
         if i=='Experience':
             value=result_list.index(i)
             value=value+2
@@ -172,15 +128,17 @@ def main(argv):
                 a=str(result_list[value])
                 if a.__contains__('-'):
                     k=a.split('-')
-                    print('start:',k[0],'end:',k[1])
+               #     print('start:',k[0],'end:',k[1])
                     break
                 elif result_list[value] =='':
                     break
             
-            listOfExp = ["company", "position","period","place","description" ]
-   
+            listOfExp = ["company", "position","period","place","description" ]  
             zipbObj = zip(listOfExp, experience)
             exp_dict = dict(zipbObj)
+            exp_dict['startdate']=k[0]
+            exp_dict['enddate']=k[1]
+
 
         
         if i=='Education':
@@ -189,23 +147,23 @@ def main(argv):
             while True:
                 education.append(result_list[value])
                 value=value+1
-                # a=str(result_list[value])
-                # if a.__contains__('-'):
-                #     k=a.split('-')
-                #     print('start:',k[0],'end:',k[1])
-                #     break
                 if result_list[value] =='':
                     break
             listOfEdu = ["school", "degree" ]
-   
             zipbObj = zip(listOfEdu, education)
             edu_dict = dict(zipbObj)
 
-   # print(languages)
-    print('###############')
-    print(contact,'\n',linkedin,'\n',summary,'\n',skills,'\n',certifications,'\n',languages,'\n',exp_dict,'\n',edu_dict)
+    alld['contact']=contact
+    alld['skills']=skills
+    alld['linkedin']=linkedin[0]
+    alld['skills']=skills
+    alld['certifications']=certifications
+    alld['summary']=summary
+    alld['languages']= languages  
+    alld.update(edu_dict)
+    alld.update(exp_dict)
 
-    #print(data.splitlines())
+    print(alld,'\n')
     device.close()
     retstr.close()
     return
