@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sys
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -9,12 +8,8 @@ from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
-import io
-from contextlib import redirect_stdout
 
-# main
 def parse(resume):
-    import getopt
     imagewriter = None
     caching = True
     laparams = LAParams()
@@ -22,18 +17,6 @@ def parse(resume):
     rsrcmgr = PDFResourceManager(caching=caching)
     device = TextConverter(rsrcmgr, retstr, laparams=laparams,imagewriter=imagewriter )
     data = []
-    
-
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
-    for page in PDFPage.get_pages(resume,caching=caching, check_extractable=True):
-        interpreter.process_page(page)
-        data = retstr.getvalue()
-
-    weird=["\xa0","\uf0da","\x0c","• ","* ","(LinkedIn)"," (LinkedIn)","\uf0a7","(Mobile)","-       ","●"]
-    for i in weird:
-       data=data.replace(i, "")
-    
-    result_list=data.split('\n')
     skills=[]
     languages=[]
     summary=[]
@@ -46,13 +29,23 @@ def parse(resume):
     edu_dict={}
     alld={}
 
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    for page in PDFPage.get_pages(resume,caching=caching, check_extractable=True):
+        interpreter.process_page(page)
+        data = retstr.getvalue()
+
+    weird=["\xa0","\uf0da","\x0c","• ","* ","(LinkedIn)"," (LinkedIn)","\uf0a7","(Mobile)","-       ","●"]
+    for i in weird:
+       data=data.replace(i, "")
+    
+    result_list=data.split('\n')
+
     for i in result_list:
         if i=='Contact':
             value=result_list.index(i)
             while True:
                 value=value+1
                 contact.append(result_list[value].strip())
-                
                 if result_list[value] =='':
                     contact.remove(result_list[value])
                     break
@@ -63,7 +56,6 @@ def parse(resume):
                 linkedin.append(result_list[value])
                 value=value+1
                 if result_list[value] =='':
-            
                     break
             if len(linkedin)>=2:
                 ln=[]
@@ -80,7 +72,6 @@ def parse(resume):
                     skills.remove(result_list[value])
                     break
           
-    
         if i.__contains__('Certifications'):
             value=result_list.index(i)
             while True:
@@ -128,8 +119,6 @@ def parse(resume):
             exp_dict['startdate']=k[0]
             exp_dict['enddate']=k[1]
 
-
-        
         if i=='Education':
             value=result_list.index(i)
             value=value+1
@@ -151,33 +140,7 @@ def parse(resume):
     alld['languages']= languages  
     alld.update(edu_dict)
     alld.update(exp_dict)
-    # alld['message']= "testing" 
-    # alld['host']= "jobhax.com"  
-
-    import requests
-    import json
-    Parsed_data = json.dumps(alld)
-
-    print(Parsed_data)
     device.close()
     retstr.close()
 
     return alld
-
-#     graylog_url = "http://127.0.0.1:12201/gelf"
-
-
-#     #header = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-#     #payload = '{"short_message":"Hello there", "host":"example.org", "facility":"test", "_foo":"bar"}'
-#    # payload=Parsed_data
-#     response_code=requests.post(graylog_url, data=Parsed_data)
-#     if response_code == '202':
-#         print('Data was successfully sent to Graylog Server')
-#     else:
-#         print('Failed to sent data to Graylog Server')
-
-#     #print(alld,'\n')
-    
-    #return
-#if __name__ == '__main__': sys.exit(main(sys.argv))
-
