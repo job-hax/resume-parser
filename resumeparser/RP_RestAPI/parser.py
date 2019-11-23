@@ -13,38 +13,27 @@ import io
 from contextlib import redirect_stdout
 
 # main
-def main(argv):
+def parse(resume):
     import getopt
-    (opts, args) = getopt.getopt(argv[1:], 'dP:o:t:O:c:s:R:Y:p:m:SCnAVM:W:L:F:')
-    pagenos = set()
-    maxpages = 0
     imagewriter = None
-    # pageno = 1
     caching = True
-    # showpageno = False
     laparams = LAParams()
-    # pages_text = []
- 
     retstr = io.StringIO()
     rsrcmgr = PDFResourceManager(caching=caching)
     device = TextConverter(rsrcmgr, retstr, laparams=laparams,imagewriter=imagewriter )
     data = []
     
-    for fname in args:
-        with open(fname, 'rb') as fp:
-            interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.get_pages(fp,
-                                          maxpages=maxpages, 
-                                          caching=caching, check_extractable=True):
-                interpreter.process_page(page)
-                data = retstr.getvalue()
+
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    for page in PDFPage.get_pages(resume,caching=caching, check_extractable=True):
+        interpreter.process_page(page)
+        data = retstr.getvalue()
 
     weird=["\xa0","\uf0da","\x0c","• ","* ","(LinkedIn)"," (LinkedIn)","\uf0a7","(Mobile)","-       ","●"]
     for i in weird:
        data=data.replace(i, "")
     
     result_list=data.split('\n')
-    #print(result_list)
     skills=[]
     languages=[]
     summary=[]
@@ -162,10 +151,33 @@ def main(argv):
     alld['languages']= languages  
     alld.update(edu_dict)
     alld.update(exp_dict)
+    # alld['message']= "testing" 
+    # alld['host']= "jobhax.com"  
 
-    print(alld,'\n')
+    import requests
+    import json
+    Parsed_data = json.dumps(alld)
+
+    print(Parsed_data)
     device.close()
     retstr.close()
-    return
-if __name__ == '__main__': sys.exit(main(sys.argv))
+
+    return alld
+
+#     graylog_url = "http://127.0.0.1:12201/gelf"
+
+
+#     #header = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+#     #payload = '{"short_message":"Hello there", "host":"example.org", "facility":"test", "_foo":"bar"}'
+#    # payload=Parsed_data
+#     response_code=requests.post(graylog_url, data=Parsed_data)
+#     if response_code == '202':
+#         print('Data was successfully sent to Graylog Server')
+#     else:
+#         print('Failed to sent data to Graylog Server')
+
+#     #print(alld,'\n')
+    
+    #return
+#if __name__ == '__main__': sys.exit(main(sys.argv))
 
