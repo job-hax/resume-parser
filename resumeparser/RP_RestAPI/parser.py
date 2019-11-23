@@ -8,6 +8,7 @@ from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
 from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LAParams
 from pdfminer.image import ImageWriter
+import io
 
 def parse(resume):
     imagewriter = None
