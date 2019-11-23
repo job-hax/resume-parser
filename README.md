@@ -36,6 +36,11 @@ Output:
 
 ![Alt text](img/postman.jpg?raw=true "Postman Parameters")
 
+
+3. OR Query using CURL from command line:
+```
+curl -X POST --header "Content-Type:multipart/form-data" --form "resume=@sample/linkedin_resume.pdf"  http://127.0.0.1:8002/api/parser/
+```
 Output:
 ```
 {
@@ -72,4 +77,5 @@ Output:
     "enddate": "Present"
 }
 ```
+
 Development is still ongoing.
