@@ -2,6 +2,12 @@
 
 - Linkedin Resume Parser developed in Python3.
 
+![JobHax Website](https://img.shields.io/website?label=jobposting-be.jobhax.com/admin&up_message=Up%20and%20Running&url=https%3A%2F%2Fjobposting.jobhax.com)
+![Alt text](https://img.shields.io/github/issues-raw/job-hax/resume-parser.svg)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/w/job-hax/resume-parser?style=plastic)
+![GitHub contributors](https://img.shields.io/github/contributors/job-hax/resume-parser.svg)
+![GitHub repo size](https://img.shields.io/github/repo-size/job-hax/resume-parser.svg)
+![GitHub languages](https://img.shields.io/github/languages/count/job-hax/resume-parser)
 
 ## Quickstart
 Step-by-step walkthrough of how to use Resume-Parser.
