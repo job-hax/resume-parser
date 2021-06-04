@@ -1,4 +1,4 @@
   
-Django==2.2.8
+Django==2.2.21
 djangorestframework
 pdfminer
